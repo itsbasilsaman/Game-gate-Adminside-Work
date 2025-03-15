@@ -26,6 +26,7 @@ import GetOffer from "./components/pages/offer-management/getOffer";
 import ProductListSection from "./components/pages/product/productList";
 import ProductItem from "./components/pages/product/productListItem";
 import LevelForm from "./components/pages/level/createLevel";
+import LevelListSection from "./components/pages/level/getLevels";
 
 export const App: React.FC = React.memo(() => {
   const { isLoggedGGAdmin } = useSelector((state: RootState) => state.auth);
@@ -62,6 +63,7 @@ export const App: React.FC = React.memo(() => {
               <Route path="/subserviceform" element={<SubServiceForm />} />
               <Route path="/brandlist" element={<BrandList />} />
               <Route path="/levelform" element={<LevelForm />} />
+              <Route path="/getlevels" element={<LevelListSection />} />
               <Route path="/servicelistsection" element={<ServiceListSection />} />
               <Route path="/userlist" element={<UserList />} />
               <Route path="/getuser/:userId" element={<GetUserById />} />
