@@ -6,8 +6,8 @@ interface LevelFormErrors {
 
 export const validateLevelForm = (
   level: number | undefined,
-  requiredTransactionsUSD: number | undefined,
-  requiredTransactionsSR: number | undefined
+  requiredTransactionsUSD: number | undefined ,
+  requiredTransactionsSR: number | undefined  
 ): { errors: LevelFormErrors; hasError: boolean } => {
   const errors: LevelFormErrors = {
     level: "",

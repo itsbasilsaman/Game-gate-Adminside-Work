@@ -31,11 +31,13 @@ const LevelForm: React.FC = () => {
 
     if (!hasError) {
       try {
-        const formData = {
-          level,
-          requiredTransactionsUSD,
-          requiredTransactionsSR,
-        };
+        const formData = new FormData();
+        formData.append("level", String(level ?? 0));
+        formData.append("requiredTransactionsUSD", String(requiredTransactionsUSD ?? 0));
+        formData.append("requiredTransactionsSR", String(requiredTransactionsSR ?? 0));
+         
+        
+        
 
         console.log("Level data being sent:", formData);
         
