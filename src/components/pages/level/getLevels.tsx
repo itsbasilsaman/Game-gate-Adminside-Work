@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { GetLevelAction } from '../../../reduxKit/actions/auth/level/levelAction';
-// import { toast } from 'react-toastify';
+import { GetLevelAction, GetLevelByIdAction, UpdateLevelAction } from '../../../reduxKit/actions/auth/level/levelAction';
 import { AppDispatch } from '../../../reduxKit/store';
+import { useNavigate } from 'react-router-dom';
+
 const LevelListSection = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [levels, setLevels] = useState<any[]>([]);
   const [detailedLevelId, setDetailedLevelId] = useState<string | null>(null);
-  // const { levelLoading, error } = useSelector((state: RootState) => state.level);
+  const [levelById, setLevelById] = useState<any>({});
+  const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [editedLevel, setEditedLevel] = useState<Partial<any>>({});
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLevels = async () => {
@@ -27,12 +32,68 @@ const LevelListSection = () => {
   }, [dispatch]);
 
   const handleViewDetails = (id: string) => {
-    if (detailedLevelId === id) {
-      setDetailedLevelId(null); // Collapse if already expanded
-    } else {
-      setDetailedLevelId(id); // Expand the selected level
+    setDetailedLevelId((prevLvl) => (prevLvl === id ? null : id));
+  };
+
+  const handleLevelByIdFunction = (id: string) => {
+    console.log(id);
+    navigate(`/getlevels/${id}`);
+  };
+
+  const handleEditClick = (level: any) => {
+    setIsEditing(level.id);
+    setEditedLevel({ ...level });
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setEditedLevel((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleUpdate = async (id: string) => {
+    try {
+     
+      const updatedData = {
+        requiredTransactionsUSD: parseFloat(editedLevel.requiredTransactionsUSD || '0'),
+        requiredTransactionsSR: parseFloat(editedLevel.requiredTransactionsSR || '0'),
+      };
+  
+      const resultAction = await dispatch(
+        UpdateLevelAction({
+          id,
+          ...updatedData,
+        })
+      );
+  
+      if (UpdateLevelAction.fulfilled.match(resultAction)) {
+        setLevels((prevLevels) =>
+          prevLevels.map((level) =>
+            level.id === id ? { ...level, ...updatedData } : level
+          )
+        );
+        setIsEditing(null);
+      } else {
+        console.error("Failed to update level: ", resultAction.payload || resultAction.error);
+      }
+    } catch (error) {
+      console.error("Unexpected error while updating level: ", error);
     }
   };
+  useEffect(() => {
+    const getLevelByIdFunction = async () => {
+      if (!detailedLevelId) return;
+      try {
+        const resultAction = await dispatch(GetLevelByIdAction(detailedLevelId));
+        if (GetLevelByIdAction.fulfilled.match(resultAction)) {
+          setLevelById(resultAction.payload.data);
+        } else {
+          console.error("Failed to fetch level by ID: ", resultAction.payload || resultAction.error);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getLevelByIdFunction();
+  }, [detailedLevelId, dispatch]);
 
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -40,29 +101,7 @@ const LevelListSection = () => {
         <h4 className="text-xl font-semibold text-black dark:text-white">Level List</h4>
       </div>
 
-      {/* {error && (
-        <div className="w-full justify-center flex items-center">
-          <div className="flex items-center w-1/2 justify-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-md animate-bounce">
-            <svg
-              className="w-6 h-6 mr-2 text-red-600 animate-pulse"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.99-.816 1.99-1.87V6.87C20.99 5.816 20.054 5 19 5H5c-1.054 0-1.99.816-1.99 1.87v8.26c0 1.054.936 1.87 1.99 1.87z"
-              />
-            </svg>
-            <p className="font-semibold">Failed to load levels. Please try again later.</p>
-          </div>
-        </div>
-      )} */}
-
-      <div className="grid grid-cols-3 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-4 md:px-6 2xl:px-7.5">
+      <div className="grid grid-cols-3 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-6 md:px-6 2xl:px-7.5">
         <div className="col-span-1 flex items-center">
           <p className="font-medium">Level</p>
         </div>
@@ -75,43 +114,87 @@ const LevelListSection = () => {
         <div className="col-span-1 flex items-center">
           <p className="font-medium">Actions</p>
         </div>
-      </div>
-
-      {/* {levelLoading && (
-        <div className="flex justify-center items-center py-4 h-[60vh] w-full">
-          <div className="w-8 h-8 border-4 border-blue-950 border-dashed rounded-full animate-spin"></div>
+        <div className="col-span-1 flex items-center">
+          <p className="font-medium">Level by Users</p>
         </div>
-      )} */}
+        <div className="col-span-1 flex items-center">
+          <p className="font-medium">View Detail</p>
+        </div>
+      </div>
 
       {levels.map((level) => (
         <div key={level.id}>
-          <div className="grid grid-cols-3 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-4 md:px-6 2xl:px-7.5">
+          <div className="grid grid-cols-3 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-6 md:px-6 2xl:px-7.5">
             <div className="col-span-1 flex items-center">
               <p className="text-sm text-black dark:text-white">{level.level}</p>
             </div>
             <div className="col-span-1 flex items-center">
-              <p className="text-sm text-black dark:text-white">{level.requiredTransactionsUSD}</p>
+              {isEditing === level.id ? (
+                <input
+                  type="number"
+                  value={editedLevel.requiredTransactionsUSD || ''}
+                  onChange={(e) => handleInputChange('requiredTransactionsUSD', e.target.value)}
+                  className="border p-1 rounded"
+                />
+              ) : (
+                <p className="text-sm text-black dark:text-white">{level.requiredTransactionsUSD}</p>
+              )}
             </div>
             <div className="col-span-1 flex items-center">
-              <p className="text-sm text-black dark:text-white">{level.requiredTransactionsSR}</p>
+              {isEditing === level.id ? (
+                <input
+                  type="number"
+                  value={editedLevel.requiredTransactionsSR || ''}
+                  onChange={(e) => handleInputChange('requiredTransactionsSR', e.target.value)}
+                  className="border p-1 rounded"
+                />
+              ) : (
+                <p className="text-sm text-black dark:text-white">{level.requiredTransactionsSR}</p>
+              )}
+            </div>
+            <div className="col-span-1 flex items-center">
+              {isEditing === level.id ? (
+                <button
+                  onClick={() => handleUpdate(level.id)}
+                  className="text-sm bg-green-500 px-3 py-2 text-white font-bold"
+                >
+                  Update
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleEditClick(level)}
+                  className="text-sm bg-blue-500 px-3 py-2 text-white font-bold"
+                >
+                  Edit
+                </button>
+              )}
             </div>
             <div className="col-span-1 flex items-center">
               <button
-                onClick={() => handleViewDetails(level.id)}
-                className="text-sm bg-blue-500 p-1 rounded-md text-white font-bold"
+                className="text-sm bg-blue-800 px-3 py-2 rounded-md text-white font-bold"
+                onClick={() => handleLevelByIdFunction(level.id)}
               >
-                View Details
+                Get Users
+              </button>
+            </div>
+            <div className="col-span-1 flex items-center">
+              <button
+                className="text-sm bg-blue-950 px-3 py-2 rounded-md text-white font-bold"
+                onClick={() => handleViewDetails(level.id)}
+              >
+                View Detail
               </button>
             </div>
           </div>
 
           {detailedLevelId === level.id && (
             <div className="col-span-full bg-gray-100 dark:bg-gray-800 p-4 flex justify-around items-center">
-              <p>Level: {level.level}</p>
-              <p>Required Transactions (USD): {level.requiredTransactionsUSD}</p>
-              <p>Required Transactions (SR): {level.requiredTransactionsSR}</p>
-              <p>Created At: {new Date(level.createdAt).toLocaleDateString()}</p>
-              <p>Updated At: {new Date(level.updatedAt).toLocaleDateString()}</p>
+              <p>
+                <span className="font-medium">Created At - </span> {new Date(levelById.createdAt).toLocaleDateString()}
+              </p>
+              <p>
+                <span className="font-medium">Updated At - </span> {new Date(levelById.updatedAt).toLocaleDateString()}
+              </p>
             </div>
           )}
         </div>

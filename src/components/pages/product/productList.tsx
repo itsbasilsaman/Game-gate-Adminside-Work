@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-// import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { GetProductAction } from '../../../reduxKit/actions/auth/product/productAction';
-import { AppDispatch } from '../../../reduxKit/store';
+import { AppDispatch, RootState } from '../../../reduxKit/store';
 import { Link } from 'react-router-dom';
 
 interface Product {
@@ -19,7 +19,7 @@ const ProductListSection = () => {
  
   
 
-  // const { serviceLoading, error } = useSelector((state: RootState) => state.product);
+  const { loading } = useSelector((state: RootState) => state.product);
 
   useEffect(() => {
     const getProductList = async () => {
@@ -62,6 +62,12 @@ const ProductListSection = () => {
               <p className="font-medium">Details</p>
             </div>
           </div>
+          
+      {loading && (
+        <div className="flex justify-center items-center py-4 h-[60vh] w-full">
+          <div className="w-8 h-8 border-4 border-blue-950 border-dashed rounded-full animate-spin"></div>
+        </div>
+      )}
   
           {/* Product Rows */}
           {product.map((item) => (

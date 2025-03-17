@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {axiosIn, configWithToken} from "../../../../config/constants";
 import { createAsyncThunk } from "@reduxjs/toolkit";
  
@@ -48,29 +49,30 @@ export const GetLevelAction= createAsyncThunk(
   )
 
 
-export const UpdateLevelAction= createAsyncThunk(
+  export const UpdateLevelAction = createAsyncThunk(
     "admin/EditLevel",
-    async (adminCredentials:FormData,{rejectWithValue})=>{
-        try {
-            console.log( "admin service data  ",adminCredentials);
-            const id = adminCredentials.get('id');
-            const response = await axiosIn.put(`/admin/level/${id}`, adminCredentials,configWithToken());
-            console.log("the response data is of edityed level update  he dat is the  خب سثق ", response);
-            return response.data;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } catch (error: any) {
-            if (error.response && error.response.data) {
-              return rejectWithValue(error.response.data.message);
-            } else {
-              return rejectWithValue({ message: "Something went wrong!" });
-            }
-          }
+    async (adminCredentials: { id: string; requiredTransactionsUSD: number; requiredTransactionsSR: number }, { rejectWithValue }) => {
+      try {
+        const { id, requiredTransactionsUSD, requiredTransactionsSR } = adminCredentials;
+        const response = await axiosIn.put(
+          `/admin/level/${id}`,
+          { requiredTransactionsUSD, requiredTransactionsSR },
+          configWithToken()
+        );
+        return response.data;
+      } catch (error: any) {
+        if (error.response && error.response.data) {
+          return rejectWithValue(error.response.data.message);
+        } else {
+          return rejectWithValue({ message: "Something went wrong!" });
+        }
+      }
     }
-  )
+  );
   
 export const GetLevelByIdAction= createAsyncThunk(
     "admin/getLevelById",
-    async (id:string,{rejectWithValue})=>{ 
+    async (id:string | null,{rejectWithValue})=>{ 
         try {
             console.log( "admin get service ",id);
             const response = await axiosIn.get(`/admin/level/${id}`,configWithToken());
@@ -91,7 +93,7 @@ export const GetUsersByLevelAction= createAsyncThunk(
     async (id:string,{rejectWithValue})=>{ 
         try {
             console.log( "admin get service ",id);
-            const response = await axiosIn.get(`/admin/level/${id}/users?limit=10&skip=20`,configWithToken());
+            const response = await axiosIn.get(`/admin/level/${id}/users?limit=100&skip=20`,configWithToken());
             console.log("the response get tyhe level data is ", response);
             return response.data
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -160,17 +160,13 @@ const GetOffer = () => {
             key={index}
             className="border border-stroke dark:border-strokedark p-4 rounded-lg"
           >
-            <div className="flex flex-col md:flex-row justify-between items-center mb-2 ">
-              <h5 className="text-lg font-semibold"><span className="text-[18px] font-medium">Title : </span>{offer.title}</h5>
-             
-            </div>
+            
             <div className="w-full flex flex-col md:flex-row justify-between gap-3">
-  <p className="text-sm text-gray-600">
-    <span className="text-[16px] font-medium text-black">Arabic Title : </span>
-    {offer.titleAr}
-  </p>
   
- 
+            <p className="text-sm text-gray-600">
+            <h5 className="text-lg font-semibold"><span className="text-[18px] font-medium">  </span>{offer.title}</h5>
+    
+  </p>
   <div className="flex flex-col md:flex-row gap-6 items-center">
     <button
       onClick={() => handleVerificationOffer(offer?.id)}
@@ -205,6 +201,11 @@ const GetOffer = () => {
 
             {expandedIndex === index && (
               <div className="mt-4">
+                <p className="text-sm text-gray-600">
+    <span className="text-[16px] font-medium text-black"> Arabic Title : </span>
+     {offer.titleAr}
+  </p>
+  
                 <div className="flex flex-col md:flex-row w-full justify-between my-3">
                   <p className="text-sm"><span className="text-[16px] font-medium">Description : </span>{offer.description}</p>
                   <p className="text-sm"><span className="text-[16px] font-medium ">Arabic Description : </span>{offer.descriptionAr}</p>

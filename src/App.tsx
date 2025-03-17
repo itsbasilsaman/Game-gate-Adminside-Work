@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "./reduxKit/store";
 import DefaultLayout from "./layout/DefaultLayout";
 import Cookies from "js-cookie";
-// import ECommerce from "./components/pages/Dashboard/Ecommerce";
 import SubServiceForm from "./components/pages/Form/SubServiceForm";
 import BrandData from "./components/pages/Form/AddBrand"; 
 import SubService from "./components/Table/SubService";
@@ -27,6 +26,7 @@ import ProductListSection from "./components/pages/product/productList";
 import ProductItem from "./components/pages/product/productListItem";
 import LevelForm from "./components/pages/level/createLevel";
 import LevelListSection from "./components/pages/level/getLevels";
+import GetUsersByLevel from "./components/pages/level/getUsersByLevel";
 
 export const App: React.FC = React.memo(() => {
   const { isLoggedGGAdmin } = useSelector((state: RootState) => state.auth);
@@ -62,8 +62,6 @@ export const App: React.FC = React.memo(() => {
               <Route path="/sellerprofile" element={<SellerProfile />} />
               <Route path="/subserviceform" element={<SubServiceForm />} />
               <Route path="/brandlist" element={<BrandList />} />
-              <Route path="/levelform" element={<LevelForm />} />
-              <Route path="/getlevels" element={<LevelListSection />} />
               <Route path="/servicelistsection" element={<ServiceListSection />} />
               <Route path="/userlist" element={<UserList />} />
               <Route path="/getuser/:userId" element={<GetUserById />} />
@@ -74,6 +72,10 @@ export const App: React.FC = React.memo(() => {
               <Route path="/addregion" element={<AddRegion />} />
               <Route path="/regionlist" element={<RegionListSection />} />
               <Route path="/getoffer" element={<GetOffer />} />
+              {/* Level */}
+              <Route path="/levelform" element={<LevelForm />} />
+              <Route path="/getlevels" element={<LevelListSection />} />
+              <Route path="/getlevels/:id" element={<GetUsersByLevel/>} />
             </Routes>
           </DefaultLayout>
         )}

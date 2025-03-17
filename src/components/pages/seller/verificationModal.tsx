@@ -10,12 +10,14 @@ interface VerificationModalProps {
 const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, onSubmit, userId }) => {
   const [isAccepted, setIsAccepted] = useState<boolean>(false);
   const [rejectionReason, setRejectionReason] = useState<string>("");
+  const [error, setError] = useState<string>('')
 
   const handleSubmit = () => {
     if (!isAccepted && !rejectionReason) {
-      alert("Please provide a reason for rejection.");
+      setError("Please provide a reason for rejection.");
       return;
     } 
+    setError('')
     onSubmit(isAccepted ? "ACCEPT" : "REJECT", rejectionReason);
     onClose();
   };
@@ -54,6 +56,7 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, 
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
             />
+            <p className="text-[15px] text-red-700">{error}</p>
           </div>
         )}
         <div className="flex justify-end">

@@ -12,6 +12,8 @@ const SellerList = React.memo(() => {
   const [expandedSellerId, setExpandedSellerId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [loadingSellerId, setLoadingSellerId] = useState<string | null>(null);
+
   const dispatch = useDispatch<AppDispatch>();
   const { loading } = useSelector((state: RootState) => state.seller);
 
@@ -58,34 +60,37 @@ const SellerList = React.memo(() => {
     }
   };
 
-  const handleVerification = async (action: string, rejectionReason?: string) => {
-    if (selectedUserId) {
-      try {
-        const resultAction = await dispatch(
-          UpdateVerificationSellerAction({
-            userId: selectedUserId,
-            action,
-            rejectionReason,
-          })
-        );
+ const handleVerification = async (action: string, rejectionReason?: string) => {
+  if (selectedUserId) {
+    setLoadingSellerId(selectedUserId); // Start loading state
+    try {
+      const resultAction = await dispatch(
+        UpdateVerificationSellerAction({
+          userId: selectedUserId,
+          action,
+          rejectionReason,
+        })
+      );
 
-        if (UpdateVerificationSellerAction.fulfilled.match(resultAction)) {
-          console.log("Verification status updated successfully:", resultAction.payload);
-          // Refresh the seller list or update the specific seller's status
-          const updatedSellers = sellers.map((seller) =>
-            seller.userId === selectedUserId
-              ? { ...seller, verificationStatus: action === "ACCEPT" ? "APPROVED" : "REJECTED" }
-              : seller
-          );
-          setSellers(updatedSellers);
-        } else {
-          console.log("Failed to update verification status: ", resultAction.payload || resultAction.error);
-        }
-      } catch (error) {
-        console.error("Unexpected error while updating verification status: ", error);
+      if (UpdateVerificationSellerAction.fulfilled.match(resultAction)) {
+        console.log("Verification status updated successfully:", resultAction.payload);
+        // Update the seller list with new status
+        const updatedSellers = sellers.map((seller) =>
+          seller.userId === selectedUserId
+            ? { ...seller, verificationStatus: action === "ACCEPT" ? "APPROVED" : "REJECTED" }
+            : seller
+        );
+        setSellers(updatedSellers);
+      } else {
+        console.log("Failed to update verification status: ", resultAction.payload || resultAction.error);
       }
+    } catch (error) {
+      console.error("Unexpected error while updating verification status: ", error);
+    } finally {
+      setLoadingSellerId(null); // Reset loading state
     }
-  };
+  }
+};
 
  
 
@@ -139,17 +144,23 @@ const SellerList = React.memo(() => {
               <p>{seller.user.userName}</p>
             </div>
             <div className="col-span-2 flex items-center gap-4">
-              <button
-                className={`px-4 py-2 rounded-full text-white ${
-                  seller.verificationStatus === 'PENDING'
-                    ? 'bg-orange-500'
-                    : seller.verificationStatus === 'APPROVED'
-                    ? 'bg-green-500'
-                    : 'bg-red-500'
-                }`}
-              >
-                {seller.verificationStatus}
-              </button>
+            <button
+  className={`px-6 py-2 rounded-full text-white flex items-center justify-center ${
+    seller.verificationStatus === "PENDING"
+      ? "bg-orange-500"
+      : seller.verificationStatus === "APPROVED"
+      ? "bg-green-500"
+      : "bg-red-500"
+  }`}
+  disabled={loadingSellerId === seller.userId} // Disable button while loading
+>
+  {loadingSellerId === seller.userId ? (
+    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+  ) : (
+    seller.verificationStatus
+  )}
+</button>
+
             </div>
             <div className="col-span-2 flex items-center">
               <button
@@ -165,15 +176,15 @@ const SellerList = React.memo(() => {
           {expandedSellerId === seller.userId && sellerDetails && (
             <div className="border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:px-6 2xl:px-7.5 flex  justify-between">
               <div>
-                <h4 className="text-lg font-semibold text-black dark:text-white">Seller Details</h4>
-                <p><strong>Country:</strong> {sellerDetails.user.country || "N/A"}</p>
-                <p><strong>Description:</strong> {sellerDetails.user.description || "N/A"}</p>
-                <p><strong>Email:</strong> {sellerDetails.user.email}</p>
-                <p><strong>First Name:</strong> {sellerDetails.user.firstName}</p>
-                <p><strong>Last Name:</strong> {sellerDetails.user.lastName}</p>
-                <p><strong>Gender:</strong> {sellerDetails.user.gender}</p>
-                <p><strong>Member Since:</strong> {new Date(sellerDetails.user.memberSince).toLocaleDateString()}</p>
-                <p><strong>Phone Number:</strong> {sellerDetails.user.phoneNumber}</p>
+                <h4 className="text-[22px] font-bold text-black dark:text-white text-center">Seller Details</h4>
+                <p><strong>Country </strong> {sellerDetails.user.country || "N/A"}</p>
+                <p><strong>Description </strong> {sellerDetails.user.description || "N/A"}</p>
+                <p><strong>Email </strong> {sellerDetails.user.email}</p>
+                <p><strong>First Name </strong> {sellerDetails.user.firstName}</p>
+                <p><strong>Last Name </strong> {sellerDetails.user.lastName}</p>
+                <p><strong>Gender </strong> {sellerDetails.user.gender}</p>
+                <p><strong>Member Since </strong> {new Date(sellerDetails.user.memberSince).toLocaleDateString()}</p>
+                <p><strong>Phone Number </strong> {sellerDetails.user.phoneNumber}</p>
               </div>
               <button
                 className="ml-4  text-[18px] font-medium text-blue-900 "

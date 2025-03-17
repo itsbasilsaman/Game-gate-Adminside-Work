@@ -540,7 +540,7 @@ const AddProduct: React.FC = () => {
                 {/* Sub-Service ID */}
                 <div>
                   <label className="block text-black">
-                    SubService ID <span className="text-red-500">*</span>
+                    SubService ID <span className="text-blue-500"> Optional</span>
                   </label>
                   <select
                     name="subServiceId"
@@ -571,7 +571,7 @@ const AddProduct: React.FC = () => {
 
                 <div>
                   <label className="block text-black">
-                    Upload Image <span className="text-red-500">*</span>
+                    Upload Image <span className="text-red-500">Maximum size lessthan 3Mb</span>
                   </label>
                   <input
                     type="file"
