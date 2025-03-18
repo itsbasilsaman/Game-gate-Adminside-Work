@@ -40,7 +40,7 @@ export const App: React.FC = React.memo(() => {
 
   // Redirect to login page if token is missing and not already on the login page
   if (!accessToken && !isLoginRoute) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   return (
@@ -48,7 +48,7 @@ export const App: React.FC = React.memo(() => {
       <Toaster position="top-center" />
       <Suspense fallback={<Loading />}>
         <Routes>
-          <Route path="/"  element={<AdminLogin />} />
+          <Route path="/admin/login"  element={<AdminLogin />} />
         </Routes>
         {!isLoginRoute && isLoggedGGAdmin && (
           <DefaultLayout>
