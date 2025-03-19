@@ -14,7 +14,7 @@ export const AddSubServiceAction= createAsyncThunk(
         try {
             console.log( "admin service data is   ",adminCredentials);
             const response = await axiosIn.post(`/admin/sub-service`, adminCredentials,configWithToken());
-            console.log("the response data is خب سثق ", response);
+            
             return response.data;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error: any) {
@@ -31,7 +31,7 @@ export const EditSubServiceAction= createAsyncThunk(
     "admin/EditService",
     async (adminCredentials:FormData,{rejectWithValue})=>{
         try {
-            console.log( "admin service data  ",adminCredentials);
+      
             const id = adminCredentials.get('id');
             const response = await axiosIn.put(`/admin/sub-service/${id}`, adminCredentials,configWithToken());
             console.log("the response data is of edityed sevices he dat is the  خب سثق ", response);
@@ -126,6 +126,3 @@ export const ActiveInActiveSubServiceAction= createAsyncThunk(
     }
   )
   
-
-
-

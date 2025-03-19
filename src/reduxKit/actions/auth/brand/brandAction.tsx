@@ -66,9 +66,9 @@ export const GetAllBrandAction= createAsyncThunk(
   )
 
 export const GetBrandByIdAction= createAsyncThunk(
-    "admin/getBrandById",
+    "admin/getBrandById", 
     async (id:string,{rejectWithValue})=>{ 
-        try {
+        try { 
             console.log( "admin get brand ",id);
             const response = await axiosIn.get(`/admin/brand/${id}`,configWithToken());
             console.log("the response get tyhe service data is ", response);
@@ -87,7 +87,7 @@ export const ActiveBrandInActiveAction = createAsyncThunk(
   "admin/ActiveBrandInActive",
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await axiosIn.put(`/admin/brand/${id}`, { isActive: true }, configWithToken());
+      const response = await axiosIn.patch(`/admin/brand/${id}`, {}, configWithToken());
       console.log("the response data is ", response);
       return response.data.data;
     } catch (error: any) {
@@ -99,9 +99,6 @@ export const ActiveBrandInActiveAction = createAsyncThunk(
     }
   }
 );
-
-
-
 
   export const DeleteBrandAction= createAsyncThunk(
     "admin/deleteBrand",
@@ -121,7 +118,3 @@ export const ActiveBrandInActiveAction = createAsyncThunk(
           }
     }
   )
-  
-
-
-

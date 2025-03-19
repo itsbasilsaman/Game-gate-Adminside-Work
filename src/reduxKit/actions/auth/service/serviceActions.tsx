@@ -1,4 +1,4 @@
-import {configWithTokenMultiPart,axiosIn, configWithToken} from "../../../../config/constants";
+import {axiosIn, configWithToken,configWithTokenMultiPart} from "../../../../config/constants";
 
 
 
@@ -131,6 +131,3 @@ export const ActiveInActiveAction= createAsyncThunk(
     }
   )
   
-
-
-

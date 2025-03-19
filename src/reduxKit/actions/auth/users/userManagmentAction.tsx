@@ -33,9 +33,9 @@ export const BanUserAction= createAsyncThunk(
         // const data="cfed79be-84c1-44f5-a344-e9618002b426"
         
         try {
-            const response = await axiosIn.post(`/admin/user/ban/${id}`,configWithTokenk());
+            const response = await axiosIn.post(`/admin/user/ban/${id}`,{},configWithTokenk());
             console.log("the response get tyhe service data is ", response);
-            return response.data.data;
+            return response.data;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error: any) {
             if (error.response && error.response.data) {
@@ -50,9 +50,9 @@ export const UnBanUserAction= createAsyncThunk(
     "admin/UnBanUserAction",
     async (id:string,{rejectWithValue})=>{ 
         try {
-            const response = await axiosIn.post(`/admin/user/unban/${id}`,configWithToken());
+            const response = await axiosIn.post(`/admin/user/unban/${id}`,{},configWithToken());
             console.log("the response get tyhe unban data is ", response);
-            return response.data.data;
+            return response.data;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error: any) {
             if (error.response && error.response.data) {
@@ -84,7 +84,3 @@ export const UnBanUserAction= createAsyncThunk(
           }
     }
   ) 
-
-
-
-

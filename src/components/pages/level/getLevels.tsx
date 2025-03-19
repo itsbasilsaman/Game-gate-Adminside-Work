@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { GetLevelAction, GetLevelByIdAction, UpdateLevelAction } from '../../../reduxKit/actions/auth/level/levelAction';
-import { AppDispatch } from '../../../reduxKit/store';
+import { GetLevelAction, UpdateLevelAction } from '../../../reduxKit/actions/auth/level/levelAction';
+import { AppDispatch, RootState } from '../../../reduxKit/store';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const LevelListSection = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [levels, setLevels] = useState<any[]>([]);
   const [detailedLevelId, setDetailedLevelId] = useState<string | null>(null);
-  const [levelById, setLevelById] = useState<any>({});
+   
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [editedLevel, setEditedLevel] = useState<Partial<any>>({});
+
+  const { loading} = useSelector((state:RootState) => state.level)
 
   const navigate = useNavigate();
 
@@ -20,7 +23,9 @@ const LevelListSection = () => {
       try {
         const resultAction = await dispatch(GetLevelAction());
         if (GetLevelAction.fulfilled.match(resultAction)) {
-          setLevels(resultAction.payload.levels);
+          setLevels(resultAction.payload.data.levels);
+          console.log('Set Levels',resultAction.payload.data.levels);
+          
         } else {
           console.error("Failed to fetch levels: ", resultAction.payload || resultAction.error);
         }
@@ -51,23 +56,17 @@ const LevelListSection = () => {
 
   const handleUpdate = async (id: string) => {
     try {
-     
-      const updatedData = {
-        requiredTransactionsUSD: parseFloat(editedLevel.requiredTransactionsUSD || '0'),
-        requiredTransactionsSR: parseFloat(editedLevel.requiredTransactionsSR || '0'),
-      };
+      const updatedData = new FormData();
+      updatedData.append('id', id);
+      updatedData.append('requiredTransactionsUSD', editedLevel.requiredTransactionsUSD?.toString() || '0');
+      updatedData.append('requiredTransactionsSR', editedLevel.requiredTransactionsSR?.toString() || '0');
   
-      const resultAction = await dispatch(
-        UpdateLevelAction({
-          id,
-          ...updatedData,
-        })
-      );
+      const resultAction = await dispatch(UpdateLevelAction(updatedData));
   
       if (UpdateLevelAction.fulfilled.match(resultAction)) {
         setLevels((prevLevels) =>
           prevLevels.map((level) =>
-            level.id === id ? { ...level, ...updatedData } : level
+            level.id === id ? { ...level, ...Object.fromEntries(updatedData.entries()) } : level
           )
         );
         setIsEditing(null);
@@ -78,22 +77,8 @@ const LevelListSection = () => {
       console.error("Unexpected error while updating level: ", error);
     }
   };
-  useEffect(() => {
-    const getLevelByIdFunction = async () => {
-      if (!detailedLevelId) return;
-      try {
-        const resultAction = await dispatch(GetLevelByIdAction(detailedLevelId));
-        if (GetLevelByIdAction.fulfilled.match(resultAction)) {
-          setLevelById(resultAction.payload.data);
-        } else {
-          console.error("Failed to fetch level by ID: ", resultAction.payload || resultAction.error);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getLevelByIdFunction();
-  }, [detailedLevelId, dispatch]);
+  
+ 
 
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -122,7 +107,14 @@ const LevelListSection = () => {
         </div>
       </div>
 
-      {levels.map((level) => (
+      {loading && (
+        <div className="flex justify-center items-center py-4 h-[60vh] w-full">
+          <div className="w-8 h-8 border-4 border-blue-950 border-dashed rounded-full animate-spin"></div>
+        </div>
+      )}
+
+      { 
+    Array.isArray(levels) && levels.length > 0 ?  ( levels.map((level) => (
         <div key={level.id}>
           <div className="grid grid-cols-3 border-t border-stroke py-4.5 px-4 dark:border-strokedark sm:grid-cols-6 md:px-6 2xl:px-7.5">
             <div className="col-span-1 flex items-center">
@@ -190,15 +182,18 @@ const LevelListSection = () => {
           {detailedLevelId === level.id && (
             <div className="col-span-full bg-gray-100 dark:bg-gray-800 p-4 flex justify-around items-center">
               <p>
-                <span className="font-medium">Created At - </span> {new Date(levelById.createdAt).toLocaleDateString()}
+                <span className="font-medium">Created At - </span> {new Date(level.createdAt).toLocaleDateString()}
               </p>
               <p>
-                <span className="font-medium">Updated At - </span> {new Date(levelById.updatedAt).toLocaleDateString()}
+                <span className="font-medium">Updated At - </span> {new Date(level.updatedAt).toLocaleDateString()}
               </p>
             </div>
           )}
         </div>
-      ))}
+      ))):
+      <p> </p>
+      
+      }
     </div>
   );
 };
