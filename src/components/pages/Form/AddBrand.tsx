@@ -8,15 +8,15 @@ import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 
 const AddBrandData: React.FC = () => {
-  const dispatch= useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
   const [name, setName] = useState<string>('');
   const [nameAr, setNameAr] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [descriptionAr, setDescriptionAr] = useState<string>('');
-  const {brandLoading}=useSelector((state:RootState)=>state.brand)
+  const { brandLoading } = useSelector((state: RootState) => state.brand);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [errors, setErrors] = useState<{nameAr:string,descriptionAr:string, name: string; description: string; image: string }>({
+  const [errors, setErrors] = useState<{ name: string; nameAr: string; description: string; descriptionAr: string; image: string }>({
     name: '',
     nameAr: '',
     description: '',
@@ -26,17 +26,14 @@ const AddBrandData: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmitBrand = async(event: React.FormEvent) => {
+  const handleSubmitBrand = async (event: React.FormEvent) => {
     event.preventDefault();
 
     // Validate the form
-    const { errors, hasError } = validateBrandData(name,nameAr, description ,descriptionAr, image);
+    const { errors, hasError } = validateBrandData(name, nameAr, description, descriptionAr, image);
     setErrors(errors);
 
     if (!hasError) {
-      console.log('Brand:', name);
-      console.log('Description:', description);
-      console.log('Uploaded Image:', image);
       const formData = new FormData();
       formData.append('name', name);
       formData.append('nameAr', nameAr);
@@ -46,20 +43,29 @@ const AddBrandData: React.FC = () => {
         formData.append('image', image);
       }
 
-      await dispatch(AddBrandAction(formData)).unwrap()
-      toast.success("Brand Added Successfully")
-      // Reset form values
-      setName('');
-      setNameAr('');
-      setDescription('');
-      setDescriptionAr('');
-      setImage(null);
-      setImagePreview(null);
-      
+      try {
+        await dispatch(AddBrandAction(formData)).unwrap();
+        toast.success('Brand Added Successfully', {
+          position: 'top-center',
+        });
+        // Reset form values
+        setName('');
+        setNameAr('');
+        setDescription('');
+        setDescriptionAr('');
+        setImage(null);
+        setImagePreview(null);
+      } catch (error) {
+        toast.error('Failed to add brand. Please try again.', {
+          position: 'top-center',
+        });
+        console.log(error);
+        
+      }
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setImage(file);
@@ -122,14 +128,14 @@ const AddBrandData: React.FC = () => {
                     type="text"
                     placeholder="Enter your Brand Name"
                     className={`w-full rounded border-[1.5px] py-3 px-5 outline-none transition ${
-                      errors.name
+                      errors.nameAr
                         ? 'border-red-500 focus:border-red-500'
                         : 'border-stroke focus:border-primary dark:border-form-strokedark dark:focus:border-primary'
                     }`}
                     value={nameAr}
                     onChange={handleInputChange(setNameAr, 'nameAr')}
                   />
-                  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.nameAr}</p>}
+                  {errors.nameAr && <p className="text-red-500 text-sm mt-1">{errors.nameAr}</p>}
                 </div>
 
                 {/* Description */}
@@ -158,14 +164,14 @@ const AddBrandData: React.FC = () => {
                     type="text"
                     placeholder="Enter your Description"
                     className={`w-full rounded border-[1.5px] py-3 px-5 outline-none transition ${
-                      errors.description
+                      errors.descriptionAr
                         ? 'border-red-500 focus:border-red-500'
                         : 'border-stroke focus:border-primary dark:border-form-strokedark dark:focus:border-primary'
                     }`}
                     value={descriptionAr}
                     onChange={handleInputChange(setDescriptionAr, 'descriptionAr')}
                   />
-                  {errors.description && <p className="text-red-500 text-sm mt-1">{errors.descriptionAr}</p>}
+                  {errors.descriptionAr && <p className="text-red-500 text-sm mt-1">{errors.descriptionAr}</p>}
                 </div>
 
                 {/* Image Upload */}
@@ -265,41 +271,35 @@ const AddBrandData: React.FC = () => {
                 <div className="col-span-1 lg:col-span-2">
                   <button
                     type="submit"
-                    className="w-full justify-center flex rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+                    className="w-full bg-primary text-white py-3 px-6 rounded hover:bg-primary-dark"
                   >
-                  <button
-                  type="submit"
-                  className="w-full bg-primary text-white py-3 px-6 rounded hover:bg-primary-dark"
-                >
-                {brandLoading ? (
-  <div className="flex items-center gap-2">
-    <svg
-      className="animate-spin h-4 w-4 text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      ></circle>
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v8z"
-      ></path>
-    </svg>
-    <span>Adding...</span>
-  </div>
-) : (
-  "Add"
-)}
-
-                </button>
+                    {brandLoading ? (
+                      <div className="flex items-center gap-2">
+                        <svg
+                          className="animate-spin h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v8z"
+                          ></path>
+                        </svg>
+                        <span>Adding...</span>
+                      </div>
+                    ) : (
+                      "Add"
+                    )}
                   </button>
                 </div>
               </div>

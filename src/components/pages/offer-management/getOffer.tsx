@@ -210,7 +210,7 @@ const GetOffer = () => {
                   <p className="text-sm"><span className="text-[16px] font-medium">Description : </span>{offer.description}</p>
                   <p className="text-sm"><span className="text-[16px] font-medium ">Arabic Description : </span>{offer.descriptionAr}</p>
                 </div>
-                <div className="flex flex-col md:flex-row w-full justify-between my-3">
+                <div className="flex flex-col  gap-3 w-full my-3">
                   <p className="text-sm"><span className="text-[16px] font-medium">Price : </span>${offer.unitPriceUSD}</p>
                   <p className="text-sm"><span className="text-[16px] font-medium">Min. Quantity : </span>{offer.minQty}</p>
                 </div>

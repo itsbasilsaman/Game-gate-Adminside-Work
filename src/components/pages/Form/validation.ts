@@ -1,48 +1,52 @@
 // Brand Validation
 export const validateBrandData = (
-    name: string,
-    nameAr:string,
-    description: string,
-    descriptionAr:string,
-    image: File | null,
-  ) => {
-    const errors: { descriptionAr:string, name:string, nameAr: string; description: string; image: string } = {
-      name: '',
-      description: '',
-      image: '',
-      descriptionAr:'',
-      nameAr:''
-    };
-    let hasError = false;
-  
-    // Validate brand
-    if (!name) {
-      errors.name = 'name is required';
-      hasError = true;
-    }
-    if (!nameAr) {
-      errors.name = 'nameAr is required';
-      hasError = true;
-    }
-  
-    // Validate description
-    if (!description) {
-      errors.description = 'Description is required';
-      hasError = true;
-    }
-    if (!descriptionAr) {
-      errors.description = 'DescriptionAr is required';
-      hasError = true;
-    }
-  
-    // Validate image
-    if (!image) {
-      errors.image = 'Image is required';
-      hasError = true;
-    }
-  
-    return { errors, hasError };
+  name: string,
+  nameAr: string,
+  description: string,
+  descriptionAr: string,
+  image: File | null,
+) => {
+  const errors: { name: string; nameAr: string; description: string; descriptionAr: string; image: string } = {
+    name: '',
+    nameAr: '',
+    description: '',
+    descriptionAr: '',
+    image: '',
   };
+  let hasError = false;
+
+  // Validate name
+  if (!name) {
+    errors.name = 'Name is required';
+    hasError = true;
+  }
+
+  // Validate nameAr
+  if (!nameAr) {
+    errors.nameAr = 'NameAr is required';
+    hasError = true;
+  }
+
+  // Validate description
+  if (!description) {
+    errors.description = 'Description is required';
+    hasError = true;
+  }
+
+  // Validate descriptionAr
+  if (!descriptionAr) {
+    errors.descriptionAr = 'DescriptionAr is required';
+    hasError = true;
+  }
+
+  // Validate image
+  if (!image) {
+    errors.image = 'Image is required';
+    hasError = true;
+  }
+
+  return { errors, hasError };
+};
   
   // AddService Validation
   export const validateServiceAndImage = (
