@@ -78,8 +78,8 @@ const GetOffer = () => {
   const [selectedOffer , setSelectedOffer] = useState<SelectedOffer | null>({})
   const [expandedProductIndex, setExpandedProductIndex] = useState<number | null>(null);
   const [update, updateStatus] = useState<boolean>(false);
-  const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
  
+  const [loadingButtons, setLoadingButtons] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     const getOffers = async () => {
@@ -107,7 +107,8 @@ const GetOffer = () => {
   };
 
   const handleVerificationOffer = async (id: string) => {
-    setIsButtonLoading(true)
+    setLoadingButtons((prev) => ({ ...prev, [id]: true })); // Set loading for this button
+  
     const offer = offers.find((o) => o.id === id);
     if (offer) {
       setSelectedOffer({
@@ -116,9 +117,9 @@ const GetOffer = () => {
         id: offer.id,
       });
     }
+  
     setSelectedOfferId(id);
     setIsModalOpen(true);
-    setIsButtonLoading(false)
   };
   
 
@@ -142,43 +143,43 @@ const GetOffer = () => {
   };
 
   return (
-    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark p-4 w-full">
-      <h4 className="text-xl font-semibold text-black dark:text-white mb-4">
+    <div className="w-full p-4 bg-white border rounded-sm border-stroke shadow-default dark:border-strokedark dark:bg-boxdark">
+      <h4 className="mb-4 text-xl font-semibold text-black dark:text-white">
         Offer Lists
       </h4>
 
       {loading && (
         <div className="flex justify-center items-center py-4 h-[60vh] w-full">
-          <div className="w-8 h-8 border-4 border-blue-950 border-dashed rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-dashed rounded-full border-blue-950 animate-spin"></div>
         </div>
       )}
 
 
-      <div className="grid grid-cols-1 gap-4 w-full">
+      <div className="grid w-full grid-cols-1 gap-4">
         {offers.map((offer, index) => (
           <div
             key={index}
-            className="border border-stroke dark:border-strokedark p-4 rounded-lg"
+            className="p-4 border rounded-lg border-stroke dark:border-strokedark"
           >
             
-            <div className="w-full flex flex-col md:flex-row justify-between gap-3">
+            <div className="flex flex-col justify-between w-full gap-3 md:flex-row">
   
             <p className="text-sm text-gray-600">
             <h5 className="text-lg font-semibold"><span className="text-[18px] font-medium">  </span>{offer.title}</h5>
     
   </p>
-  <div className="flex flex-col md:flex-row gap-6 items-center">
-    <button
-      onClick={() => handleVerificationOffer(offer?.id)}
-      className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-    >
-      {isButtonLoading ? (
-    <div className="w-8 h-8 border-4 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
-
+  <div className="flex flex-col items-center gap-6 md:flex-row">
+  <button
+  onClick={() => handleVerificationOffer(offer.id)}
+  className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+  disabled={loadingButtons[offer.id]} // Disable the button while loading
+>
+  {loadingButtons[offer.id] ? (
+    <div className="w-8 h-8 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
   ) : (
     "Update Status"
   )}
-    </button>
+</button>
     
     <p
       className={`text-sm font-semibold text-center lg:text-left ${
@@ -190,7 +191,7 @@ const GetOffer = () => {
     
     <button
       onClick={() => toggleExpand(index)}
-      className="text-blue-600 hover:text-blue-800 flex justify-center items-center uppercase gap-1"
+      className="flex items-center justify-center gap-1 text-blue-600 uppercase hover:text-blue-800"
     >
       <span className="text-[14px] font-medium">
         {expandedIndex === index ? "View Less" : "View Details"}
@@ -206,15 +207,15 @@ const GetOffer = () => {
      {offer.titleAr}
   </p>
   
-                <div className="flex flex-col md:flex-row w-full justify-between my-3">
+                <div className="flex flex-col justify-between w-full my-3 md:flex-row">
                   <p className="text-sm"><span className="text-[16px] font-medium">Description : </span>{offer.description}</p>
                   <p className="text-sm"><span className="text-[16px] font-medium ">Arabic Description : </span>{offer.descriptionAr}</p>
                 </div>
-                <div className="flex flex-col  gap-3 w-full my-3">
+                <div className="flex flex-col w-full gap-3 my-3">
                   <p className="text-sm"><span className="text-[16px] font-medium">Price : </span>${offer.unitPriceUSD}</p>
                   <p className="text-sm"><span className="text-[16px] font-medium">Min. Quantity : </span>{offer.minQty}</p>
                 </div>
-                <div className="flex flex-col md:flex-row w-full justify-between my-3">
+                <div className="flex flex-col justify-between w-full my-3 md:flex-row">
                   <p className="text-sm">
                     <span className="text-[16px] font-medium">Delivery Methods : </span>{offer.deliveryMethods.join(", ")}
                   </p>
@@ -227,7 +228,7 @@ const GetOffer = () => {
                   </div>
                 </div>
 
-                <div className="w-full flex flex-col gap-4">
+                <div className="flex flex-col w-full gap-4">
                   <div className="w-full">
                     <h6 className="font-semibold text-center py-3 text-[20px]">
                       {offer.product ? "Product Details" : ""}
@@ -236,9 +237,9 @@ const GetOffer = () => {
                     {offer.product && (
                       <div
                         onClick={() => toggleProductExpand(index)}
-                        className="cursor-pointer border p-5 rounded-lg mt-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="p-5 mt-2 border rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        <div className="flex justify-center items-center">
+                        <div className="flex items-center justify-center">
                           <img
                             src={offer.product.image}
                             alt={offer.product.title}
@@ -249,7 +250,7 @@ const GetOffer = () => {
                           <span className="text-[18px] font-medium"> Title : </span>
                           {offer.product.title}
                         </p>
-                        <p className="text-sm text-gray-600 text-center">
+                        <p className="text-sm text-center text-gray-600">
                           <span className="text-[15px] font-medium">Arabic Title : </span>
                           {offer.product.titleAr}
                         </p>
@@ -273,8 +274,8 @@ const GetOffer = () => {
                         >
                           <div className="mt-4">
                             {offer.product && (
-                              <div className="w-full flex flex-col md:flex-row justify-between">
-                                <p className="text-sm mt-2">
+                              <div className="flex flex-col justify-between w-full md:flex-row">
+                                <p className="mt-2 text-sm">
                                   <span className="text-[15px] font-medium">Description : </span>
                                   {offer.product.description}
                                 </p>
@@ -288,8 +289,8 @@ const GetOffer = () => {
                             {offer.product.brand && (
                               <div className="mt-4">
                                 <h6 className="font-semibold text-center uppercase">Brand Details</h6>
-                                <div className="border p-4 rounded-lg mt-2 bg-gray-50 dark:bg-gray-700">
-                                  <div className="flex items-center gap-4 justify-center">
+                                <div className="p-4 mt-2 border rounded-lg bg-gray-50 dark:bg-gray-700">
+                                  <div className="flex items-center justify-center gap-4">
                                     <img
                                       src={offer.product.brand.image}
                                       alt={offer.product.brand.name}
@@ -297,17 +298,17 @@ const GetOffer = () => {
                                     />
                                   </div>
                                   <div>
-                                    <p className="text-lg font-semibold text-center py-2">
+                                    <p className="py-2 text-lg font-semibold text-center">
                                       <span className="text-[15px] font-medium">Name : </span>
                                       {offer.product.brand.name}
                                     </p>
-                                    <p className="text-sm text-gray-600 text-center">
+                                    <p className="text-sm text-center text-gray-600">
                                       <span className="text-[15px] font-medium">Arabic Name : </span>
                                       {offer.product.brand.nameAr}
                                     </p>
                                   </div>
-                                  <div className="flex flex-col md:flex-row justify-between py-2">
-                                    <p className="text-sm mt-2">
+                                  <div className="flex flex-col justify-between py-2 md:flex-row">
+                                    <p className="mt-2 text-sm">
                                       <span className="text-[15px] font-medium">Description : </span>
                                       {offer.product.brand.description}
                                     </p>
@@ -322,8 +323,8 @@ const GetOffer = () => {
 
                             {offer.product.service && (
                               <div className="mt-4">
-                                <h6 className="font-semibold text-center uppercase pt-3">Service Details</h6>
-                                <div className="border p-4 rounded-lg mt-2 bg-gray-50 dark:bg-gray-700">
+                                <h6 className="pt-3 font-semibold text-center uppercase">Service Details</h6>
+                                <div className="p-4 mt-2 border rounded-lg bg-gray-50 dark:bg-gray-700">
                                   <div className="flex items-center justify-center">
                                     {offer.product.service.iconUrl && (
                                       <img
@@ -338,7 +339,7 @@ const GetOffer = () => {
                                       <span className="text-[15px] font-medium">Name : </span>
                                       {offer.product.service.name}
                                     </p>
-                                    <p className="text-sm text-gray-600 text-center">
+                                    <p className="text-sm text-center text-gray-600">
                                       <span className="text-[15px] font-medium">Arabic Name : </span>
                                       {offer.product.service.nameAr}
                                     </p>
@@ -349,8 +350,8 @@ const GetOffer = () => {
 
                             {offer.product.subService && (
                               <div className="mt-4">
-                                <h6 className="font-semibold text-center uppercase pt-3">Sub Service Details</h6>
-                                <div className="border p-4 rounded-lg mt-2 bg-gray-50 dark:bg-gray-700">
+                                <h6 className="pt-3 font-semibold text-center uppercase">Sub Service Details</h6>
+                                <div className="p-4 mt-2 border rounded-lg bg-gray-50 dark:bg-gray-700">
                                   <p className="text-lg font-semibold">
                                     <span className="text-[15px] font-medium">Name : </span>
                                     {offer.product.subService.name}
@@ -370,26 +371,26 @@ const GetOffer = () => {
                 </div>
                 <div className="w-full">
                   <h6 className="font-semibold text-center py-3 text-[20px]">Seller Details</h6>
-                  <div className="border p-5 rounded-lg mt-2">
+                  <div className="p-5 mt-2 border rounded-lg">
                     <div className="flex justify-center items-center gap-[15px]">
                       <img
                         src={offer.seller.profileImage}
                         alt={offer.seller.firstName}
-                        className="w-16 h-16 rounded-full object-cover mb-2"
+                        className="object-cover w-16 h-16 mb-2 rounded-full"
                       />
                       <div>
                         <p className="text-lg font-semibold">{offer.seller.firstName} {offer.seller.lastName}</p>
                         <p className="text-sm text-gray-600">{offer.seller.userName}</p>
                       </div>
                     </div>
-                    <div className="w-full flex flex-col md:flex-row justify-between items-center">
+                    <div className="flex flex-col items-center justify-between w-full md:flex-row">
                       <div className="flex flex-col gap-2">
-                        <p className="text-sm"><span className="font-medium mr-2">Phone :</span>{offer.seller.phoneNumber}</p>
-                        <p className="text-sm"><span className="font-medium mr-2">Gender :</span>{offer.seller.gender}</p>
+                        <p className="text-sm"><span className="mr-2 font-medium">Phone :</span>{offer.seller.phoneNumber}</p>
+                        <p className="text-sm"><span className="mr-2 font-medium">Gender :</span>{offer.seller.gender}</p>
                       </div>
                       <div className="flex flex-col gap-2">
-                        <p className="text-sm"><span className="font-medium mr-2">Email :</span>{offer.seller.email}</p>
-                        <p className="text-sm"><span className="font-medium mr-2">Country :</span>{offer.seller.country}</p>
+                        <p className="text-sm"><span className="mr-2 font-medium">Email :</span>{offer.seller.email}</p>
+                        <p className="text-sm"><span className="mr-2 font-medium">Country :</span>{offer.seller.country}</p>
                       </div>
                     </div>
                     <div
@@ -408,12 +409,17 @@ const GetOffer = () => {
       </div>
 
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveStatus}
-        initialStatus ={selectedOffer?.status || ""}
-        initialAdminNote={selectedOffer?.adminNote || ""}
-      />
+  isOpen={isModalOpen}
+  onClose={() => {
+    setIsModalOpen(false);
+    if (selectedOfferId) {
+      setLoadingButtons((prev) => ({ ...prev, [selectedOfferId]: false })); // Reset loading for this button
+    }
+  }}
+  onSave={handleSaveStatus}
+  initialStatus={selectedOffer?.status || ""}
+  initialAdminNote={selectedOffer?.adminNote || ""}
+/>
     </div>
   );
 };

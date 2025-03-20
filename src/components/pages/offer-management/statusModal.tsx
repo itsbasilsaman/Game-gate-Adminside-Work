@@ -15,6 +15,7 @@ const Modal = ({ isOpen, onClose, onSave, initialStatus = "", initialAdminNote =
   const [adminNote, setAdminNote] = useState<string>(initialAdminNote);
   const [statusError, setStatusError] = useState<boolean>(false);
   const [noteError, setNoteError] = useState<boolean>(false);
+  
 
   // Ensure state updates when modal opens with new data
   useEffect(() => {
@@ -48,17 +49,17 @@ const Modal = ({ isOpen, onClose, onSave, initialStatus = "", initialAdminNote =
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4"
+          className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50"
         >
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.8 }}
-            className="bg-white dark:bg-boxdark rounded-lg p-6 w-full max-w-md"
+            className="w-full max-w-md p-6 bg-white rounded-lg dark:bg-boxdark"
           >
-            <h2 className="text-xl font-semibold mb-4">Update Offer Status</h2>
+            <h2 className="mb-4 text-xl font-semibold">Update Offer Status</h2>
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Status</label>
+              <label className="block mb-2 text-sm font-medium">Status</label>
               <div className="flex gap-4">
                 <button
                   onClick={() => {
@@ -86,7 +87,7 @@ const Modal = ({ isOpen, onClose, onSave, initialStatus = "", initialAdminNote =
               {statusError && <p className="text-red-700">Please select a status</p>}
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Admin Note</label>
+              <label className="block mb-2 text-sm font-medium">Admin Note</label>
               <textarea
                 value={adminNote}
                 onChange={(e) => {
@@ -103,7 +104,7 @@ const Modal = ({ isOpen, onClose, onSave, initialStatus = "", initialAdminNote =
               <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
                 Cancel
               </button>
-              <button onClick={handleSave} className="px-4 py-2 bg-blue-500 text-white rounded">
+              <button onClick={handleSave} className="px-4 py-2 text-white bg-blue-500 rounded">
                 Save
               </button>
             </div>
